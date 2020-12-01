@@ -25,38 +25,67 @@
 
 pragma solidity ^0.6.0;
 
-import { MultiOwnable } from "./MultiOwnable.sol";
-import { Owners } from "./Owners.sol";
-
+import {MultiOwnable} from "./MultiOwnable.sol";
+import {Owners} from "./Owners.sol";
 
 /**
- * @notice Base contract which allows children to implement an emergency stop
- * mechanism
- * @dev Forked from https://github.com/OpenZeppelin/openzeppelin-contracts/blob/feb665136c0dae9912e08397c1a21c4af3651ef3/contracts/lifecycle/Pausable.sol
- * Modifications:
- * 1. Added pauser role, switched pause/unpause to be onlyPauser (6/14/2018)
- * 2. Removed whenNotPause/whenPaused from pause/unpause (6/14/2018)
- * 3. Removed whenPaused (6/14/2018)
- * 4. Switches ownable library to use ZeppelinOS (7/12/18)
- * 5. Remove constructor (7/13/18)
- * 6. Reformat, conform to Solidity 0.6 syntax and add error messages (5/13/20)
- * 7. Make public functions external (5/27/20)
+ * @dev Contract module which allows children to implement an emergency stop
+ * mechanism that can be triggered by an authorized account.
+ *
+ * This module is used through inheritance. It will make available the
+ * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
+ * the functions of your contract. Note that they will not be pausable by
+ * simply including this module, only once the modifiers are put in place.
  */
 contract Pausable is MultiOwnable {
-    event Pause();
-    event Unpause();
+    /**
+     * @dev Emitted when the pause is triggered by a pauser (`account`).
+     */
+    event Paused(address indexed account, string text);
+
+    /**
+     * @dev Emitted when the pause is lifted by a pauser (`account`).
+     */
+    event Unpaused(address indexed account);
+
     event PauserChanged(address indexed newAddress);
 
     address public pauser;
-    bool public paused = false;
+    bool private _paused;
+    string private _pauseText;
 
-    constructor(Owners owner) MultiOwnable(owner) public {}
+    /**
+     * @dev Initializes the contract in unpaused state. Assigns the Pauser role
+     * to the deployer.
+     */
+    constructor(Owners owner) public MultiOwnable(owner) {
+        _paused = false;
+    }
+
+    /**
+     * @dev Returns true if the contract is paused, and false otherwise.
+     */
+    function paused() external view returns (bool) {
+        return _paused;
+    }
+
+    function pauseText() external view returns (string memory) {
+        return _pauseText;
+    }
 
     /**
      * @dev Modifier to make a function callable only when the contract is not paused.
      */
     modifier whenNotPaused() {
-        require(!paused, "Pausable: paused");
+        require(!_paused, "[CNHC] System paused");
+        _;
+    }
+
+    /**
+     * @dev Modifier to make a function callable only when the contract is paused.
+     */
+    modifier whenPaused() {
+        require(_paused, "[CNHC] System not paused");
         _;
     }
 
@@ -64,34 +93,33 @@ contract Pausable is MultiOwnable {
      * @dev throws if called by any account other than the pauser
      */
     modifier onlyPauser() {
-        require(msg.sender == pauser, "Pausable: caller is not the pauser");
+        require(msg.sender == pauser, "[CNHC] Caller is not the pauser");
         _;
     }
 
     /**
-     * @dev called by the owner to pause, triggers stopped state
+     * @dev Called by a pauser to pause, triggers stopped state.
      */
-    function pause() external onlyPauser {
-        paused = true;
-        emit Pause();
+    function pause(string memory text) public onlyPauser whenNotPaused {
+        _paused = true;
+        _pauseText = text;
+        emit Paused(msg.sender, _pauseText);
     }
 
     /**
-     * @dev called by the owner to unpause, returns to normal state
+     * @dev Called by a pauser to unpause, returns to normal state.
      */
-    function unpause() external onlyPauser {
-        paused = false;
-        emit Unpause();
+    function unpause() public onlyPauser whenPaused {
+        _paused = false;
+        _pauseText = "";
+        emit Unpaused(msg.sender);
     }
 
     /**
      * @dev update the pauser role
      */
     function updatePauser(address _newPauser) external onlyOwners {
-        require(
-            _newPauser != address(0),
-            "Pausable: new pauser is the zero address"
-        );
+        require(_newPauser != address(0), "[CNHC] New pauser is the zero address");
         pauser = _newPauser;
         emit PauserChanged(pauser);
     }

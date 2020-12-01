@@ -1,3 +1,9 @@
+/**
+ * SPDX-License-Identifier: LGPL
+ *
+ * Copyright (c) Invest & Pay International(Singapore) Pte. Ltd., 2020-2022
+ *
+ */
 pragma solidity ^0.6.0;
 
 library BillCommon {

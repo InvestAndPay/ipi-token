@@ -9,14 +9,14 @@ contract Owners {
      * @param previousOwner representing the address of the previous owner
      * @param newOwner representing the address of the new owner
      */
-    event OwnershipTransferred(address previousOwner, address newOwner);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-    event AddNewOwner(address newOwner);
+    event AddNewOwner(address indexed newOwner);
 
-    event RemoveOwner(address owner);
+    event RemoveOwner(address indexed owner);
 
     modifier onlyMainOwner() {
-        require(msg.sender == _mainOwner, "Owners: caller is not the main owner");
+        require(msg.sender == _mainOwner, "[OWN] Caller is not the main owner");
         _;
     }
 
@@ -44,34 +44,25 @@ contract Owners {
     }
 
     /**
-    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-    * @param newOwner The address to transfer ownership to.
-    */
+     * @dev Allows the current owner to transfer control of the contract to a newOwner.
+     * @param newOwner The address to transfer ownership to.
+     */
     function transferMainOwnership(address newOwner) external onlyMainOwner {
-        require(
-            newOwner != address(0),
-            "MultiOwnable: new owner is the zero address"
-        );
+        require(newOwner != address(0), "[OWN] New owner is the zero address");
         emit OwnershipTransferred(_mainOwner, newOwner);
         setMainOwner(newOwner);
     }
 
     function addOwner(address owner) external onlyMainOwner {
-        require(
-            owner != address(0),
-            "MultiOwnable: new owner is the zero address"
-        );
+        require(owner != address(0), "[OWN] New owner is the zero address");
         _owners[owner] = true;
 
         emit AddNewOwner(owner);
     }
 
     function removeOwner(address owner) external onlyMainOwner {
-        require(
-            owner != address(0),
-            "MultiOwnable: new owner is the zero address"
-        );
-        require(_owners[owner], "MultiOwnable: owner is not existed");
+        require(owner != address(0), "[OWN] New owner is the zero address");
+        require(_owners[owner], "[OWN] Owner is not existed");
 
         delete _owners[owner];
 

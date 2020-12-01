@@ -36,7 +36,6 @@ import "./Owners.sol";
  * 3. Make public functions external (5/27/20)
  */
 contract MultiOwnable {
-
     Owners public ownersContract;
 
     /**
@@ -46,45 +45,43 @@ contract MultiOwnable {
         ownersContract = _owners;
     }
 
-    function setOwnersContract(Owners _owners) external onlyOwners {
-        ownersContract = _owners;
-    }
+    // Deprecated
+    // function setOwnersContract(Owners _owners) external onlyOwners {
+    //     ownersContract = _owners;
+    // }
 
     /**
      * @dev Throws if called by any account other than the owner.
      */
-    modifier onlyMainOwner() {
-        require(
-            tx.origin == ownersContract.mainOwner(),
-            "MultiOwnable: caller is not the main owner");
-        _;
-    }
+    // modifier onlyMainOwner() {
+    //     require(
+    //         tx.origin == ownersContract.mainOwner(),
+    //         "MultiOwnable: caller is not the main owner");
+    //     _;
+    // }
 
     /**
      * @dev Throws if called by any account other than the main owner or other owners.
      */
     modifier onlyOwners() {
-        require(
-            tx.origin == ownersContract.mainOwner() || ownersContract.isOwner(tx.origin),
-            "MultiOwnable: caller is not the owner members"
-        );
+        require(tx.origin == ownersContract.mainOwner() || ownersContract.isOwner(tx.origin), "MultiOwnable: caller is not the owner members");
         _;
     }
 
-//    modifier onlyOwnersIncludeOrigin() {
-//        if (tx.origin == msg.sender) {
-//            require(
-//                msg.sender == _mainOwner || msg.sender == _contractOwner || owners[msg.sender],
-//                "MultiOwnable: caller is not the owner members"
-//            );
-//        } else {
-//            require(
-//                tx.origin == _mainOwner || msg.sender == _mainOwner
-//                || tx.origin == _contractOwner || msg.sender == _contractOwner
-//                || owners[tx.origin] || owners[msg.sender],
-//                "MultiOwnable: caller is not the owner members"
-//            );
-//        }
-//        _;
-//    }
+    //    modifier onlyOwnersIncludeOrigin() {
+    //        if (tx.origin == msg.sender) {
+    //            require(
+    //                msg.sender == _mainOwner || msg.sender == _contractOwner || owners[msg.sender],
+    //                "MultiOwnable: caller is not the owner members"
+    //            );
+    //        } else {
+    //            require(
+    //                tx.origin == _mainOwner || msg.sender == _mainOwner
+    //                || tx.origin == _contractOwner || msg.sender == _contractOwner
+    //                || owners[tx.origin] || owners[msg.sender],
+    //                "MultiOwnable: caller is not the owner members"
+    //            );
+    //        }
+    //        _;
+    //    }
 }

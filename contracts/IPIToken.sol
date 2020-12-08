@@ -33,10 +33,12 @@ contract IPIToken is ERC1155, MultiOwnable, Pausable {
     BillManager private billManager;
 
     constructor(BillManager manager, string memory uri) public ERC1155(uri) Pausable(manager.ownersContract()) {
+        require(address(manager) != address(0),"[CNHC] Address zero is forbiden");
         billManager = manager;
     }
 
     function setBillManager(BillManager _billManager) external onlyOwners {
+        require(address(_billManager) != address(0),"[CNHC] Address zero is forbiden");
         billManager = _billManager;
     }
 
@@ -76,6 +78,7 @@ contract IPIToken is ERC1155, MultiOwnable, Pausable {
         address[] calldata accounts,
         uint256[] calldata amounts
     ) external onlyOwners checkNormalIds(_asSingletonArray(_id)) {
+        require(accounts.length > 0, "[CNHC] Parameter (accounts) length must be not zero");
         require(accounts.length == amounts.length, "[CNHC] Parameters (accounts) and (amounts) must be the same length");
         address billAddr = address(billManager.bills(_id));
 
@@ -92,6 +95,7 @@ contract IPIToken is ERC1155, MultiOwnable, Pausable {
         uint256[] calldata newIds,
         uint256[] calldata newAmounts
     ) external onlyOwners checkNormalIds(newIds) {
+        require(account != address(0) , "[CNHC] Address zero is forbiden");
         // Phrase 1
         uint256 totalOldBalance;
         uint256[] memory oldBalanceArray;

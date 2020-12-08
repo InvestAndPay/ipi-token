@@ -61,7 +61,6 @@ contract Owners {
     }
 
     function removeOwner(address owner) external onlyMainOwner {
-        require(owner != address(0), "[OWN] New owner is the zero address");
         require(_owners[owner], "[OWN] Owner is not existed");
 
         delete _owners[owner];

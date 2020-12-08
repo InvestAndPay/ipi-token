@@ -45,11 +45,6 @@ contract MultiOwnable {
         ownersContract = _owners;
     }
 
-    // Deprecated
-    // function setOwnersContract(Owners _owners) external onlyOwners {
-    //     ownersContract = _owners;
-    // }
-
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -64,24 +59,7 @@ contract MultiOwnable {
      * @dev Throws if called by any account other than the main owner or other owners.
      */
     modifier onlyOwners() {
-        require(tx.origin == ownersContract.mainOwner() || ownersContract.isOwner(tx.origin), "MultiOwnable: caller is not the owner members");
+        require(msg.sender == ownersContract.mainOwner() || ownersContract.isOwner(msg.sender), "MultiOwnable: caller is not the owner members");
         _;
     }
-
-    //    modifier onlyOwnersIncludeOrigin() {
-    //        if (tx.origin == msg.sender) {
-    //            require(
-    //                msg.sender == _mainOwner || msg.sender == _contractOwner || owners[msg.sender],
-    //                "MultiOwnable: caller is not the owner members"
-    //            );
-    //        } else {
-    //            require(
-    //                tx.origin == _mainOwner || msg.sender == _mainOwner
-    //                || tx.origin == _contractOwner || msg.sender == _contractOwner
-    //                || owners[tx.origin] || owners[msg.sender],
-    //                "MultiOwnable: caller is not the owner members"
-    //            );
-    //        }
-    //        _;
-    //    }
 }

@@ -28,6 +28,7 @@ contract BillManager is MultiOwnable {
         _;
     }
     modifier onlyExistedIds(uint256[] memory _ids) {
+        require(_ids.length > 0,"[BM] Parameter (_ids) length must be not zero");
         for (uint256 i = 0; i < _ids.length; ++i) {
             require(address(bills[_ids[i]]) != address(0), "[BM] Some bill ids not found");
         }
@@ -81,6 +82,7 @@ contract BillManager is MultiOwnable {
         Bill[] calldata _bills,
         BillCommon.BillState[] calldata _states
     ) external onlyOwners {
+        require(_ids.length > 0,"[BM] Parameter (_ids) length must be not zero");
         require(_ids.length == _bills.length, "[BM] Parameters (_ids) and (_bills) must be the same length");
         require(_bills.length == _states.length, "[BM] Parameters (_bills) and (_states) must be the same length");
 
@@ -93,6 +95,7 @@ contract BillManager is MultiOwnable {
 
     /// @notice Inspect the statues of specified bills
     function verifyIds(uint256[] calldata _ids, BillCommon.BillState expectedState) external view returns (bool) {
+        require(_ids.length > 0,"[BM] Parameter (_ids) length must be not zero");
         require(_ids.length < 30, "[BM] Parameter (_ids) size too large");
         for (uint256 i = 0; i < _ids.length; ++i) {
             if (billStates[_ids[i]] != expectedState) {
